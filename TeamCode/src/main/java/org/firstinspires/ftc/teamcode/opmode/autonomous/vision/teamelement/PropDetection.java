@@ -69,9 +69,9 @@ class PropDetection extends LinearOpMode {
             rightCrop = YCbCr.submat(rightRect);
             middleCrop = YCbCr.submat(middleRect);
 
-            Core.extractChannel(leftCrop, leftCrop, 2);
-            Core.extractChannel(rightCrop, rightCrop, 2);
-            Core.extractChannel(middleCrop, middleCrop, 2);
+            Core.extractChannel(leftCrop, leftCrop, 0);
+            Core.extractChannel(rightCrop, rightCrop, 0);
+            Core.extractChannel(middleCrop, middleCrop, 0);
 
             Scalar leftAverage = Core.mean(leftCrop);
             Scalar rightAverage = Core.mean(rightCrop);
