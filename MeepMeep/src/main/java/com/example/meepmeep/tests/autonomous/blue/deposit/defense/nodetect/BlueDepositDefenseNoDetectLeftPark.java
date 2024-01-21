@@ -8,7 +8,7 @@ import com.noahbres.meepmeep.core.colorscheme.scheme.ColorSchemeRedDark;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
-public class BlueDepositDefenseNoPark {
+public class BlueDepositDefenseNoDetectLeftPark {
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(600);
 
@@ -24,6 +24,9 @@ public class BlueDepositDefenseNoPark {
                 .splineTo(new Vector2d(36, -10), Math.toRadians(0))
                 .turnTo(Math.toRadians(-90))
                 .lineToY(-36)
+                .waitSeconds(15)
+                .lineToY(36)
+                .splineTo(new Vector2d(60, 58), Math.toRadians(0))
                 .build());
 
         // Declare out second bot
@@ -37,7 +40,7 @@ public class BlueDepositDefenseNoPark {
                 .lineToY(-36)
                 .waitSeconds(2.5)
                 .turn(Math.toRadians(-90))
-                .lineToX(15)
+                .lineToX(10)
                 .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_JUICE_DARK)
