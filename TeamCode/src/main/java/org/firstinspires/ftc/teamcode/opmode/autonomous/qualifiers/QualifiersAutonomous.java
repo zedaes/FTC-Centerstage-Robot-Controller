@@ -5,9 +5,12 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.acmerobotics.roadrunner.Trajectory;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.opmode.autonomous.roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.opmode.autonomous.vision.apriltag.AprilTagDetectionPipeline;
 import org.openftc.apriltag.AprilTagDetection;
@@ -128,6 +131,7 @@ public class QualifiersAutonomous extends LinearOpMode {
                 for (AprilTagDetection tag : currentDetections) {
                     if (tags.contains(tag) || !tagsDetected.contains(tag)) {
                         tagsDetected.add(tag);
+                        aprilTagToTelemetry(tag);
                     }
                 }
             }
@@ -135,5 +139,49 @@ public class QualifiersAutonomous extends LinearOpMode {
         return (tagsDetected);
     }
 
-    public
+    public void aprilTagToTelemetry(AprilTagDetection detection) {
+        Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
+
+        telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
+        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
+        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
+        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
+        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", rot.firstAngle));
+        telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", rot.secondAngle));
+        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", rot.thirdAngle));
+    }
+
+    public int getAprilTagID(AprilTagDetection detection){
+        return detection.id;
+    }
+
+    public long getAprilTagTranslationX(AprilTagDetection detection){
+        return (long) (detection.pose.x*FEET_PER_METER);
+    }
+
+    public long getAprilTagTranslationY(AprilTagDetection detection){
+        return (long) (detection.pose.y*FEET_PER_METER);
+    }
+
+    public long getAprilTagTranslationZ(AprilTagDetection detection){
+        return (long) (detection.pose.z*FEET_PER_METER);
+    }
+
+    public float getAprilRotationYaw(AprilTagDetection detection){
+        Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
+        return rot.firstAngle;
+    }
+
+    public float getAprilRotationPitch(AprilTagDetection detection){
+        Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
+        return rot.secondAngle;
+    }
+
+    public float getAprilRotationRoll(AprilTagDetection detection){
+        Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
+        return rot.thirdAngle;
+    }
+
+
+
 }
