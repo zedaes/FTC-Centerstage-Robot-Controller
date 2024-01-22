@@ -134,4 +134,6 @@ public class QualifiersAutonomous extends LinearOpMode {
         }
         return (tagsDetected);
     }
+
+    public
 }
