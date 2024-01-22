@@ -72,28 +72,26 @@ public class QualifiersAutonomous extends LinearOpMode {
 
         waitForStart();
         stopwatch = new ElapsedTime();
-
-        while (opModeIsActive()){
-            ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
-
-            currentPose = robot.pose;
-            switch (teamPropDetectionPipeline.teamPropZone){
-                case 1:
-                    telemetry.addLine("left");
-                    goToPixelPosition1(robot, currentPose);
-                    break;
-                case 2:
-                    telemetry.addLine("middle");
-                    goToPixelPosition2(robot, currentPose);
-                    break;
-                case 3:
-                    telemetry.addLine("right");
-                    goToPixelPosition3(robot, currentPose);
-                    break;
-            }
-            camera.setPipeline(aprilTagDetectionPipeline);
-
+        ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
+        currentPose = robot.pose;
+        switch (teamPropDetectionPipeline.teamPropZone){
+            case 1:
+                telemetry.addLine("left");
+                goToPixelPosition1(robot, currentPose);
+                break;
+            case 2:
+                telemetry.addLine("middle");
+                goToPixelPosition2(robot, currentPose);
+                break;
+            case 3:
+                telemetry.addLine("right");
+                goToPixelPosition3(robot, currentPose);
+                break;
         }
+        camera.setPipeline(aprilTagDetectionPipeline);
+
+
+
     }
 
     public void goToPixelPosition1(MecanumDrive robot, Pose2d pose){
@@ -116,5 +114,24 @@ public class QualifiersAutonomous extends LinearOpMode {
                         .splineTo(new Vector2d(30, 30), Math.PI / 2)
                         .splineTo(new Vector2d(0, 60), Math.PI)
                         .build());
+    }
+
+    public ArrayList getAprilTagDetections(ElapsedTime stopwatch, long searchTime) {
+        ArrayList tagsDetected = null;
+        while (stopwatch.time() < stopwatch.time() + searchTime) {
+            ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
+            tagsDetected = null;
+
+            if (currentDetections.size() != 0) {
+                boolean tagFound = false;
+
+                for (AprilTagDetection tag : currentDetections) {
+                    if (tags.contains(tag) || !tagsDetected.contains(tag)) {
+                        tagsDetected.add(tag);
+                    }
+                }
+            }
+        }
+        return (tagsDetected);
     }
 }
