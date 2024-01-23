@@ -1,23 +1,48 @@
 package org.firstinspires.ftc.teamcode.opmode.autonomous.qualifiers;
 
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Rotation2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
 import org.firstinspires.ftc.teamcode.opmode.autonomous.roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.opmode.autonomous.vision.apriltag.AprilTagDetectionPipeline;
-import org.openftc.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.firstinspires.ftc.teamcode.opmode.autonomous.vision.propdetection.TeamPropDetectionPipeline;
+import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.PoseVelocity2d;
+import com.acmerobotics.roadrunner.Time;
+import com.acmerobotics.roadrunner.Twist2dDual;
+import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.ftc.FlightRecorder;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +64,7 @@ public class QualifiersAutonomous extends LinearOpMode {
     TeamPropDetectionPipeline teamPropDetectionPipeline;
 
     // apriltag stuff
+    AprilTagLibrary tags;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
     static final double FEET_PER_METER = 3.28084;
     double fx = 578.272;
@@ -49,15 +75,18 @@ public class QualifiersAutonomous extends LinearOpMode {
     int numFramesWithoutDetection = 0;
     final float DECIMATION_HIGH = 3;
     final float DECIMATION_LOW = 2;
+
     final float THRESHOLD_HIGH_DECIMATION_RANGE_METERS = 1.0f;
     final int THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION = 4;
-    List<Integer> tags = Arrays.asList(0, 0, 0);
+    List<Integer> tagIDs = Arrays.asList(0, 0, 0);
+
     @Override
     public void runOpMode(){
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
         teamPropDetectionPipeline = new TeamPropDetectionPipeline();
+
 
         MecanumDrive robot = new MecanumDrive(hardwareMap, startPose);
 
@@ -97,6 +126,42 @@ public class QualifiersAutonomous extends LinearOpMode {
 
     }
 
+    public static AprilTagLibrary getCenterStageTagLibrary()
+    {
+        return new AprilTagLibrary.Builder()
+                .addTag(1, "BlueAllianceLeft",
+                        2, new VectorF(61.75f, 41.41f, 4f), DistanceUnit.INCH,
+                        new Quaternion(0.3536f, -0.6124f, 0.6124f, -0.3536f, 0))
+                .addTag(2, "BlueAllianceCenter",
+                        2, new VectorF(61.75f, 35.41f, 4f), DistanceUnit.INCH,
+                        new Quaternion(0.3536f, -0.6124f, 0.6124f, -0.3536f, 0))
+                .addTag(3, "BlueAllianceRight",
+                        2, new VectorF(61.75f, 29.41f, 4f), DistanceUnit.INCH,
+                        new Quaternion(0.3536f, -0.6124f, 0.6124f, -0.3536f, 0))
+                .addTag(4, "RedAllianceLeft",
+                        2, new VectorF(61.75f, -29.41f, 4f), DistanceUnit.INCH,
+                        new Quaternion(0.3536f, -0.6124f, 0.6124f, -0.3536f, 0))
+                .addTag(5, "RedAllianceCenter",
+                        2, new VectorF(61.75f, -35.41f, 4f), DistanceUnit.INCH,
+                        new Quaternion(0.3536f, -0.6124f, 0.6124f, -0.3536f, 0))
+                .addTag(6, "RedAllianceRight",
+                        2, new VectorF(61.75f, -41.41f, 4f), DistanceUnit.INCH,
+                        new Quaternion(0.3536f, -0.6124f, 0.6124f, -0.3536f, 0))
+                .addTag(7, "RedAudienceWallLarge",
+                        5, new VectorF(-70.25f, -40.625f, 5.5f), DistanceUnit.INCH,
+                        new Quaternion(0.5f, -0.5f, -0.5f, 0.5f, 0))
+                .addTag(8, "RedAudienceWallSmall",
+                        2, new VectorF(-70.25f, -35.125f, 4f), DistanceUnit.INCH,
+                        new Quaternion(0.5f, -0.5f, -0.5f, 0.5f, 0))
+                .addTag(9, "BlueAudienceWallSmall",
+                        2, new VectorF(-70.25f, 35.125f, 4f), DistanceUnit.INCH,
+                        new Quaternion(0.5f, -0.5f, -0.5f, 0.5f, 0))
+                .addTag(10, "BlueAudienceWallLarge",
+                        5, new VectorF(-70.25f, 40.625f, 5.5f), DistanceUnit.INCH,
+                        new Quaternion(0.5f, -0.5f, -0.5f, 0.5f, 0))
+                .build();
+    }
+
     public void goToPixelPosition1(MecanumDrive robot, Pose2d pose){
         Actions.runBlocking(
                 robot.actionBuilder(pose)
@@ -129,7 +194,7 @@ public class QualifiersAutonomous extends LinearOpMode {
                 boolean tagFound = false;
 
                 for (AprilTagDetection tag : currentDetections) {
-                    if (tags.contains(tag) || !tagsDetected.contains(tag)) {
+                    if (tagIDs.contains(tag) || !tagsDetected.contains(tag)) {
                         tagsDetected.add(tag);
                         aprilTagToTelemetry(tag);
                     }
@@ -181,6 +246,26 @@ public class QualifiersAutonomous extends LinearOpMode {
         Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
         return rot.thirdAngle;
     }
+
+    public Pose2d getFCPosition(AprilTagDetection detection, double botheading) {
+        // get coordinates of the robot in RC coordinates
+        // ensure offsets are RC
+        double x = detection.ftcPose.x-camxoffset;
+        double y = detection.ftcPose.y-camyoffset;
+
+        // invert heading to correct properly
+        botheading = -botheading;
+
+        // rotate RC coordinates to be field-centric
+        double x2 = x*Math.cos(botheading)+y*Math.sin(botheading);
+        double y2 = x*-Math.sin(botheading)+y*Math.cos(botheading);
+
+        // add FC coordinates to apriltag position
+        // tags is just the CS apriltag library
+        VectorF tagpose = tags.lookupTag(detection.id).fieldPosition;
+        return new Pose2d(tagpose.get(0)+y2,tagpose.get(1)-x2,new Rotation2d(-botheading,));
+    }
+
 
 
 
