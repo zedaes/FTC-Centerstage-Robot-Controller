@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp
@@ -16,8 +18,15 @@ public class QualifiersTeleOp extends LinearOpMode {
     public double[] wheelPowers;
     public Servo [] servos;
 
+    public double servoFlip;
+
+    public float floatSlideKp;
+
+
     @Override
     public void runOpMode() throws InterruptedException{
+        servoFlip = 0;
+
         // define motors //
         DcMotor leftFront = hardwareMap.dcMotor.get("leftFront");
         DcMotor rightFont = hardwareMap.dcMotor.get("rightFront");
@@ -36,8 +45,14 @@ public class QualifiersTeleOp extends LinearOpMode {
         leftSlide.setDirection(DcMotorSimple.Direction.FORWARD);
         rightSlide.setDirection(DcMotorSimple.Direction.FORWARD);
 
+        Servo outake = hardwareMap.servo.get("outake");
+        Servo leftOutakeFlip = hardwareMap.servo.get("leftOutakeFlip");
+        Servo rightOutakeFlip = hardwareMap.servo.get("rightOutakeFlip");
+
+
         // list of all motors //
         motors = new DcMotor[]{leftFront, rightFont, leftBack, rightBack, intake, leftSlide, rightSlide};
+
 
 
         // reset motor and run with encoder //
@@ -46,9 +61,9 @@ public class QualifiersTeleOp extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
 
-        Servo outake = hardwareMap.servo.get("outake");
 
-        servos = new Servo[]{outake};
+        servos = new Servo[]{outake, leftOutakeFlip, rightOutakeFlip};
+
 
 
 
@@ -68,6 +83,18 @@ public class QualifiersTeleOp extends LinearOpMode {
                 motors[i].setPower(wheelPowers[i]);
             }
 
+            if (gamepad1.options){
+                imu.resetYaw();
+            }
+
+            if (gamepad1.right_trigger > gamepad1.left_trigger){
+                intake.setPower(gamepad1.right_trigger);
+            }
+            else{
+                intake.setPower(-gamepad1.left_trigger);
+            }
+
+
         }
     }
 
@@ -83,6 +110,33 @@ public class QualifiersTeleOp extends LinearOpMode {
 
         return (wheelPowers);
     }
+
+    public void goToPositionPID(double Kp, double Ki, double Kd, double ticks, DcMotor motor, int currentPosition, int goal){
+        double integralSum = 0;
+        double lastError = 0;
+        double error;
+        double derivative;
+        double power;
+
+        ElapsedTime PIDTimer = new ElapsedTime();
+
+        while (currentPosition != goal){
+            currentPosition = motor.getCurrentPosition();
+            error = goal - currentPosition;
+            derivative = (error - lastError) / PIDTimer.seconds();
+            integralSum = integralSum + (error * PIDTimer.seconds());
+
+            power = (Kp * error) + (Ki * integralSum) + (Kd * derivative);
+            motor.setPower(power);
+
+            lastError = error;
+
+            PIDTimer.reset();
+
+        }
+    }
+
+
 
 
 
