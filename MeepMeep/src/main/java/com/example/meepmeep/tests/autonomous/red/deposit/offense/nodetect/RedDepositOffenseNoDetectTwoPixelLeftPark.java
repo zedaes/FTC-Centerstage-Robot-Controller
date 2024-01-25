@@ -1,4 +1,4 @@
-package com.example.meepmeep.tests.autonomous.blue.deposit.offense.nodetect;
+package com.example.meepmeep.tests.autonomous.red.deposit.offense.nodetect;
 
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -7,7 +7,7 @@ import com.noahbres.meepmeep.core.colorscheme.scheme.ColorSchemeBlueDark;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
-public class BlueDepositOffenseNoDetectTwoPixelRightPark {
+public class RedDepositOffenseNoDetectTwoPixelLeftPark {
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(600);
 
@@ -18,13 +18,13 @@ public class BlueDepositOffenseNoDetectTwoPixelRightPark {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .build();
 
-        blueBotOne.runAction(blueBotOne.getDrive().actionBuilder(new Pose2d(-33, 62.5, Math.toRadians(-90)))
-                .strafeTo(new Vector2d(-36, 35))
-                .turn(Math.toRadians(-90))
+        blueBotOne.runAction(blueBotOne.getDrive().actionBuilder(new Pose2d(-33, -62.5, Math.toRadians(90)))
+                .strafeTo(new Vector2d(-36, -35))
+                .turn(Math.toRadians(90))
                 .lineToX(42.5)
                 .waitSeconds(4)
-                .strafeTo(new Vector2d(42.5,12.5))
-                .strafeTo(new Vector2d(60,12.5))
+                .strafeTo(new Vector2d(42.5,-12.5))
+                .strafeTo(new Vector2d(60,-12.5))
                 .build());
 
 

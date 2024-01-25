@@ -20,11 +20,11 @@ public class BlueDepositOffenseNoDetectTwoPixelLeftPark {
 
         blueBotOne.runAction(blueBotOne.getDrive().actionBuilder(new Pose2d(-33, 62.5, Math.toRadians(-90)))
                 .strafeTo(new Vector2d(-36, 35))
-                .turn(Math.toRadians(90))
+                .turn(Math.toRadians(-90))
                 .lineToX(42.5)
                 .waitSeconds(4)
-                .lineToX(30)
-                .splineTo(new Vector2d(60, 58), Math.toRadians(0))
+                .strafeTo(new Vector2d(42.5,60))
+                .strafeTo(new Vector2d(60,60))
                 .build());
 
 
