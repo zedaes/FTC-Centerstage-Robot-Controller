@@ -23,6 +23,7 @@ public class QualifiersTeleOp extends LinearOpMode {
     public float floatSlideKp;
 
 
+
     @Override
     public void runOpMode() throws InterruptedException{
         servoFlip = 0;
@@ -94,6 +95,13 @@ public class QualifiersTeleOp extends LinearOpMode {
                 intake.setPower(-gamepad1.left_trigger);
             }
 
+            if (gamepad2.left_bumper){
+                flipOutakeDown();
+            }
+            if (gamepad2.right_bumper){
+                flipOutakeUp();
+            }
+
 
         }
     }
@@ -134,6 +142,30 @@ public class QualifiersTeleOp extends LinearOpMode {
             PIDTimer.reset();
 
         }
+    }
+
+    public void flipOutakeUp(){
+
+    }
+
+    public void flipOutakeDown(){
+
+    }
+
+    public void slideToPosition3(){
+
+    }
+
+    public void slideToPosition2(){
+
+    }
+
+    public void slideToPosition1(){
+
+    }
+
+    public void slideToPosition0(){
+
     }
 
 
