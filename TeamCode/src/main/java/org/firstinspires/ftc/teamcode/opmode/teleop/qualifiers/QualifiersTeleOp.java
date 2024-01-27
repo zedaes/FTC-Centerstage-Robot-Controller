@@ -22,6 +22,17 @@ public class QualifiersTeleOp extends LinearOpMode {
 
     public float floatSlideKp;
 
+    public int slideLevel3;
+    public int slideLevel2;
+    public int slideLevel1;
+    public int slideLevel0;
+
+    public double slideKp;
+    public double slideKd;
+    public double slideKi;
+
+
+
 
 
     @Override
@@ -49,6 +60,7 @@ public class QualifiersTeleOp extends LinearOpMode {
         Servo outake = hardwareMap.servo.get("outake");
         Servo leftOutakeFlip = hardwareMap.servo.get("leftOutakeFlip");
         Servo rightOutakeFlip = hardwareMap.servo.get("rightOutakeFlip");
+        Servo drone = hardwareMap.servo.get("drone");
 
 
         // list of all motors //
@@ -102,6 +114,36 @@ public class QualifiersTeleOp extends LinearOpMode {
                 flipOutakeUp();
             }
 
+            if (gamepad2.y){
+                goToPositionPID(slideKp, slideKi, slideKd, leftSlide, leftSlide.getCurrentPosition(), slideLevel3);                goToPositionPID(slideKp, slideKi, slideKd, leftSlide, leftSlide.getCurrentPosition(), slideLevel3);
+                goToPositionPID(slideKp, slideKi, slideKd, rightSlide, rightSlide.getCurrentPosition(), slideLevel3);
+                flipOutakeUp();
+            }
+
+            if (gamepad2.x){
+                goToPositionPID(slideKp, slideKi, slideKd, leftSlide, leftSlide.getCurrentPosition(), slideLevel1);                goToPositionPID(slideKp, slideKi, slideKd, leftSlide, leftSlide.getCurrentPosition(), slideLevel3);
+                goToPositionPID(slideKp, slideKi, slideKd, rightSlide, rightSlide.getCurrentPosition(), slideLevel1);
+                flipOutakeUp();
+            }
+
+            if (gamepad2.b){
+                goToPositionPID(slideKp, slideKi, slideKd, leftSlide, leftSlide.getCurrentPosition(), slideLevel2);                goToPositionPID(slideKp, slideKi, slideKd, leftSlide, leftSlide.getCurrentPosition(), slideLevel3);
+                goToPositionPID(slideKp, slideKi, slideKd, rightSlide, rightSlide.getCurrentPosition(), slideLevel2);
+                flipOutakeUp();
+            }
+
+            if (gamepad2.a){
+                goToPositionPID(slideKp, slideKi, slideKd, leftSlide, leftSlide.getCurrentPosition(), slideLevel0);                goToPositionPID(slideKp, slideKi, slideKd, leftSlide, leftSlide.getCurrentPosition(), slideLevel3);
+                goToPositionPID(slideKp, slideKi, slideKd, rightSlide, rightSlide.getCurrentPosition(), slideLevel0);
+                flipOutakeDown();
+            }
+
+            if (gamepad2.dpad_up){
+                drone.setPosition(0);
+            }
+
+
+
 
         }
     }
@@ -119,7 +161,7 @@ public class QualifiersTeleOp extends LinearOpMode {
         return (wheelPowers);
     }
 
-    public void goToPositionPID(double Kp, double Ki, double Kd, double ticks, DcMotor motor, int currentPosition, int goal){
+    public void goToPositionPID(double Kp, double Ki, double Kd, DcMotor motor, int currentPosition, int goal){
         double integralSum = 0;
         double lastError = 0;
         double error;
