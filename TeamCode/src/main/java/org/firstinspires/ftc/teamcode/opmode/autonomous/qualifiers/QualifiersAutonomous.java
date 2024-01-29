@@ -4,6 +4,9 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -52,8 +55,44 @@ public class QualifiersAutonomous extends LinearOpMode {
     final float THRESHOLD_HIGH_DECIMATION_RANGE_METERS = 1.0f;
     final int THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION = 4;
     List<Integer> tags = Arrays.asList(0, 0, 0);
+
+    double slideKp = 0;
+    double slideKi = 0;
+    double slideKd = 0;
+
+    int slideGoal = 0;
+
+    public DcMotor [] motors;
     @Override
     public void runOpMode(){
+        // define motors //
+        DcMotor leftFront = hardwareMap.dcMotor.get("leftFront");
+        DcMotor rightFont = hardwareMap.dcMotor.get("rightFront");
+        DcMotor leftBack = hardwareMap.dcMotor.get("leftBack");
+        DcMotor rightBack = hardwareMap.dcMotor.get("rightBack");
+        DcMotor intake = hardwareMap.dcMotor.get("intake");
+        DcMotor leftSlide = hardwareMap.dcMotor.get("leftSlide");
+        DcMotor rightSlide = hardwareMap.dcMotor.get("rightSlide");
+
+        // set motor directions //
+        leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightFont.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftBack.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightBack.setDirection(DcMotorSimple.Direction.FORWARD);
+        intake.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftSlide.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightSlide.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        Servo outake = hardwareMap.servo.get("outake");
+        Servo leftOutakeFlip = hardwareMap.servo.get("leftOutakeFlip");
+        Servo rightOutakeFlip = hardwareMap.servo.get("rightOutakeFlip");
+        Servo drone = hardwareMap.servo.get("drone");
+
+
+        // list of all motors //
+        motors = new DcMotor[]{leftFront, rightFont, leftBack, rightBack, intake, leftSlide, rightSlide};
+
+
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
@@ -93,7 +132,23 @@ public class QualifiersAutonomous extends LinearOpMode {
         }
         camera.setPipeline(aprilTagDetectionPipeline);
 
+        switch (teamPropDetectionPipeline.teamPropZone){
+            case 1:
+                telemetry.addLine("left");
+                goToBackstageLeft(robot, currentPose);
+                break;
+            case 2:
+                telemetry.addLine("middle");
+                goToBackstageMiddle(robot, currentPose);
+                break;
+            case 3:
+                telemetry.addLine("right");
+                goToBackstageRight(robot, currentPose);
+                break;
+        }
 
+        placePixelOnBackstage(leftSlide, rightSlide);
+        parkLeft();
 
     }
 
@@ -119,6 +174,32 @@ public class QualifiersAutonomous extends LinearOpMode {
                         .build());
     }
 
+    public void goToBackstageLeft(MecanumDrive robot, Pose2d pose){
+
+    }
+
+    public void goToBackstageMiddle(MecanumDrive robot, Pose2d pose){
+
+    }
+
+    public void goToBackstageRight(MecanumDrive robot, Pose2d pose){
+
+    }
+
+    public void placePixelOnBackstage(DcMotor leftMotor, DcMotor rightMotor){
+        goToPositionPID(slideKp, slideKi, slideKd, leftMotor, leftMotor.getCurrentPosition(), slideGoal);
+        goToPositionPID(slideKp, slideKi, slideKd, rightMotor, rightMotor.getCurrentPosition(), slideGoal);
+
+    }
+
+    public void parkLeft(){
+
+    }
+
+    public void parkRight(){
+
+    }
+
     public ArrayList getAprilTagDetections(ElapsedTime stopwatch, long searchTime) {
         ArrayList tagsDetected = null;
         while (stopwatch.time() < stopwatch.time() + searchTime) {
@@ -138,6 +219,7 @@ public class QualifiersAutonomous extends LinearOpMode {
         }
         return (tagsDetected);
     }
+
 
     public void aprilTagToTelemetry(AprilTagDetection detection) {
         Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
@@ -180,6 +262,31 @@ public class QualifiersAutonomous extends LinearOpMode {
     public float getAprilRotationRoll(AprilTagDetection detection){
         Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
         return rot.thirdAngle;
+    }
+
+    public void goToPositionPID(double Kp, double Ki, double Kd, DcMotor motor, int currentPosition, int goal){
+        double integralSum = 0;
+        double lastError = 0;
+        double error;
+        double derivative;
+        double power;
+
+        ElapsedTime PIDTimer = new ElapsedTime();
+
+        while (currentPosition != goal){
+            currentPosition = motor.getCurrentPosition();
+            error = goal - currentPosition;
+            derivative = (error - lastError) / PIDTimer.seconds();
+            integralSum = integralSum + (error * PIDTimer.seconds());
+
+            power = (Kp * error) + (Ki * integralSum) + (Kd * derivative);
+            motor.setPower(power);
+
+            lastError = error;
+
+            PIDTimer.reset();
+
+        }
     }
 
 
