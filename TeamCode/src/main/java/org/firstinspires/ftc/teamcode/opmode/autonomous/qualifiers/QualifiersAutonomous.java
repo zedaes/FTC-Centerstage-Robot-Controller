@@ -175,15 +175,27 @@ public class QualifiersAutonomous extends LinearOpMode {
     }
 
     public void goToBackstageLeft(MecanumDrive robot, Pose2d pose){
-
+        Actions.runBlocking(
+                robot.actionBuilder(pose)
+                        .splineTo(new Vector2d(30, 30), Math.PI / 2)
+                        .splineTo(new Vector2d(0, 60), Math.PI)
+                        .build());
     }
 
     public void goToBackstageMiddle(MecanumDrive robot, Pose2d pose){
-
+        Actions.runBlocking(
+                robot.actionBuilder(pose)
+                        .splineTo(new Vector2d(30, 30), Math.PI / 2)
+                        .splineTo(new Vector2d(0, 60), Math.PI)
+                        .build());
     }
 
     public void goToBackstageRight(MecanumDrive robot, Pose2d pose){
-
+        Actions.runBlocking(
+                robot.actionBuilder(pose)
+                        .splineTo(new Vector2d(30, 30), Math.PI / 2)
+                        .splineTo(new Vector2d(0, 60), Math.PI)
+                        .build());
     }
 
     public void placePixelOnBackstage(DcMotor leftMotor, DcMotor rightMotor){
