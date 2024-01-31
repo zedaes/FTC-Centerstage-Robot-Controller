@@ -212,6 +212,7 @@ public class QualifiersAutonomous extends LinearOpMode {
 
     }
 
+
     public ArrayList getAprilTagDetections(ElapsedTime stopwatch, long searchTime) {
         ArrayList tagsDetected = null;
         while (stopwatch.time() < stopwatch.time() + searchTime) {
