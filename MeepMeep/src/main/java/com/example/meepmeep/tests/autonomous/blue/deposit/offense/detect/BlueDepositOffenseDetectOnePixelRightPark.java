@@ -20,14 +20,11 @@ public class BlueDepositOffenseDetectOnePixelRightPark {
                 .build();
 
         blueBotOne.runAction(blueBotOne.getDrive().actionBuilder(new Pose2d(-33, 62.5, Math.toRadians(-90)))
-                .strafeTo(new Vector2d(-46, 40))
-                .strafeTo(new Vector2d(-33, 60))
-                .waitSeconds(4)
-                .strafeTo(new Vector2d(36,60))
-                .strafeToLinearHeading(new Vector2d(42.5, 36), Math.toRadians(180))
-                .strafeTo(new Vector2d(42.5,12.5))
-                .strafeTo(new Vector2d(60,12.5))
+                .splineTo(new Vector2d(-32, 34), Math.toRadians(0))
+                .strafeToLinearHeading(new Vector2d(-36, 36), Math.toRadians(180))
+                .strafeTo(new Vector2d(47.5, 36))
                 .build());
+
 
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_JUICE_DARK)

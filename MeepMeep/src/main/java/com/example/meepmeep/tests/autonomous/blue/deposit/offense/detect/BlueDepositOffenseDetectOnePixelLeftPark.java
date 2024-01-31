@@ -20,8 +20,8 @@ public class BlueDepositOffenseDetectOnePixelLeftPark {
                 .build();
 
         blueBotOne.runAction(blueBotOne.getDrive().actionBuilder(new Pose2d(-33, 62.5, Math.toRadians(-90)))
-                .strafeTo(new Vector2d(-46, 40))
-                .strafeTo(new Vector2d(-33, 60))
+                .strafeTo(new Vector2d(-36, 34))
+                .strafeToLinearHeading(new Vector2d(-40, 60), Math.toRadians(180))
                 .waitSeconds(4)
                 .strafeTo(new Vector2d(36,60))
                 .strafeToLinearHeading(new Vector2d(42, 36), Math.toRadians(180))
